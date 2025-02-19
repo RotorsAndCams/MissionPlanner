@@ -2,3 +2,7 @@
 	path = ExtLibs/mono
 	url = https://github.com/meee1/mono.git
 	shallow = true
+[submodule "Plugins/RAC-MPPlugin-UDPWeatherStation"]
+	path = Plugins/RAC-MPPlugin-UDPWeatherStation
+	url = https://github.com/RotorsAndCams/RAC-MPPlugin-UDPWeatherStation.git
+	shallow = true
