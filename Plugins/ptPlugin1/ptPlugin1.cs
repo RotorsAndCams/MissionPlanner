@@ -615,8 +615,8 @@ namespace ptPlugin1
             // Get servo settings from config
             chuteServo = Host.config.GetInt32(_chuteServoKey, 9);
             Host.config[_chuteServoKey] = chuteServo.ToString();
-            chuteServoOpenPWM = Host.config.GetInt32("chuteServoOpenPWM", 1100);
-            Host.config["chuteServoOpenPWM"] = chuteServoOpenPWM.ToString();
+            chuteServoOpenPWM = Host.config.GetInt32(_chuteServoOpenPWMKey, 1100);
+            Host.config[_chuteServoOpenPWMKey] = chuteServoOpenPWM.ToString();
 
             // Get telemetry UDP port from config
             _telemetryUdpPort = Host.config.GetInt32(_telemetryUdpPortKey, 19729);
