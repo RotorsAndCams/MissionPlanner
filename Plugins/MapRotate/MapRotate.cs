@@ -39,9 +39,15 @@ namespace MapRotate
 
     public class MapRotate : Plugin
     {
-        UdpClient udpClient;
-        IPEndPoint udpEndPoint;
         public Situation sit = new Situation();
+
+        private int _udpPort;
+        private UdpClient _udpClient;
+        private IPEndPoint _udpEndPoint;
+        private bool _isSupervisor;
+
+        private string _isSupervisorKey = "Protar_Supervisor";
+        private string _telemetryUdpPortKey = "Protar_TelemetryUdpPort";
 
         internal GMapMarkerArrow markerFDcatapult;
         internal GMapMarkerArrow markerFPcatapult;
@@ -95,12 +101,19 @@ namespace MapRotate
             Host.FPMenuMap.Items.Add(setCatapultLocationMenuItem);
             Host.FDMenuMap.Items.Add(setCatapultLocationMenuItem);
 
-            if (!isSupervisor())
+            _isSupervisor = Host.config.GetBoolean(_isSupervisorKey, false);
+            Host.config[_isSupervisorKey] = false.ToString();
+            
+            if (!_isSupervisor)
             {
+                // Get UDP port from config
+                _udpPort = Host.config.GetInt32(_telemetryUdpPortKey, 19729);
+                Host.config[_telemetryUdpPortKey] = _udpPort.ToString();
+
                 // Setup UDP broadcast listener
-                udpEndPoint = new IPEndPoint(IPAddress.Any, 19729);
-                udpClient = new UdpClient(19729);
-                udpClient.BeginReceive(new AsyncCallback(ProcessMessage), null);
+                _udpEndPoint = new IPEndPoint(IPAddress.Any, _udpPort);
+                _udpClient = new UdpClient(_udpPort);
+                _udpClient.BeginReceive(new AsyncCallback(ProcessMessage), null);
 
                 Host.FDGMapControl.Overlays.Add(situationOverlay);
             }
@@ -108,20 +121,13 @@ namespace MapRotate
             return true;
         }
 
-        //Returns true if this is a supervisor station, if there is no setting then it returns false by default
-        public bool isSupervisor()
-        {
-            bool val = Settings.Instance.GetBoolean("Protar_Supervisor", false);
-            return val;
-        }
-
         private void ProcessMessage(IAsyncResult result)
         {
             // Get message
-            string message = Encoding.UTF8.GetString(udpClient.EndReceive(result, ref udpEndPoint));
+            string message = Encoding.UTF8.GetString(_udpClient.EndReceive(result, ref _udpEndPoint));
             
             // Restart listener
-            udpClient.BeginReceive(new AsyncCallback(ProcessMessage), null);
+            _udpClient.BeginReceive(new AsyncCallback(ProcessMessage), null);
             
             //Check if this is a valid message
             if (message.Contains("sysid1"))
