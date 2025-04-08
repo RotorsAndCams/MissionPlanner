@@ -162,6 +162,11 @@ namespace ptPlugin1
         IPEndPoint FTudpEndPoint;
         internal static GMapOverlay FTOverlay = new GMapOverlay();
 
+        private IPAddress _flightTermUDPAddr;
+        private string _flightTermUDPAddrKey = "Protar_FTUDPAddr";
+        private int _flightTermUDPPort;
+        private string _flightTermUDPPortKey = "Protar_FTUDPPort";
+
         private int _telemetryUdpPort;
         private string _telemetryUdpPortKey = "Protar_TelemUDPPort";
 
@@ -602,9 +607,15 @@ namespace ptPlugin1
             _telemetryUdpPort = Host.config.GetInt32(_telemetryUdpPortKey, 19729);
             Host.config[_telemetryUdpPortKey] = _telemetryUdpPort.ToString();
 
+            // Get Flight Termination UDP address and port from config
+            _flightTermUDPAddr = IPAddress.Parse(Host.config[_flightTermUDPAddrKey, "192.168.69.100"]);
+            Host.config[_flightTermUDPAddrKey] = _flightTermUDPAddr.ToString();
+            _flightTermUDPPort = Host.config.GetInt32(_flightTermUDPPortKey, 19728);
+            Host.config[_flightTermUDPPortKey] = _flightTermUDPPort.ToString();
+
             // Set up Fligh Termination UDP packet receiving 
-            FTudpEndPoint = new IPEndPoint(IPAddress.Parse("192.168.69.100"), 19728);
-            FTudpClient = new UdpClient(19728);
+            FTudpEndPoint = new IPEndPoint(_flightTermUDPAddr, _flightTermUDPPort);
+            FTudpClient = new UdpClient(_flightTermUDPPort);
             FTudpClient.BeginReceive(new AsyncCallback(ProcessFTMessage), null);
 
             // Add Flight Termination Overlay
@@ -793,7 +804,7 @@ namespace ptPlugin1
             try
             {
                 UdpClient client = new UdpClient();
-                IPEndPoint ip = new IPEndPoint(IPAddress.Parse("192.168.69.99"), 19728);
+                IPEndPoint ip = new IPEndPoint(_flightTermUDPAddr, _flightTermUDPPort);
                 byte[] bytes = { 0xaa, 0x55, 0x00, 0x00, 0x00 };
                 bytes[2] = (byte)plane1ID;
                 bytes[3] = (byte)plane2ID;
