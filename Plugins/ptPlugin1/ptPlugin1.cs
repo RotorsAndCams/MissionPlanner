@@ -162,6 +162,9 @@ namespace ptPlugin1
         IPEndPoint FTudpEndPoint;
         internal static GMapOverlay FTOverlay = new GMapOverlay();
 
+        private int _jetControlChannel;
+        private string _jetControlChannelKey = "jetcontrolch";
+
         public override string Name
         {
             get { return "ptPlugin1"; }
@@ -364,6 +367,10 @@ namespace ptPlugin1
             eCtrl.Size = new Size(engineControlPage.Width, engineControlPage.Height);
             engineControlPage.Controls.Add(eCtrl);
             eCtrl.armClicked += ECtrl_armClicked;
+
+            // Get jet control vars from config
+            _jetControlChannel = Host.config.GetInt32(_jetControlChannelKey, 10);
+            Host.config[_jetControlChannelKey] = _jetControlChannel.ToString();
 
             eCtrl.startClicked += ECtrl_startClicked;
             eCtrl.stopClicked += ECtrl_stopClicked;
@@ -1353,17 +1360,17 @@ namespace ptPlugin1
 
         private void ECtrl_emergencyClicked(object sender, EventArgs e)
         {
-            MainV2.comPort.doCommand(MAVLink.MAV_CMD.DO_SET_SERVO, (float)Convert.ToInt16(Host.config["jetcontrolch","10"]), 1000, 0, 0, 0, 0, 0, false);
+            MainV2.comPort.doCommand(MAVLink.MAV_CMD.DO_SET_SERVO, (float)Convert.ToInt16(_jetControlChannel), 1000, 0, 0, 0, 0, 0, false);
         }
 
         private void ECtrl_stopClicked(object sender, EventArgs e)
         {
-            MainV2.comPort.doCommand(MAVLink.MAV_CMD.DO_SET_SERVO, (float)Convert.ToInt16(Host.config["jetcontrolch", "10"]), 1500, 0, 0, 0, 0, 0, false);
+            MainV2.comPort.doCommand(MAVLink.MAV_CMD.DO_SET_SERVO, (float)Convert.ToInt16(_jetControlChannel), 1500, 0, 0, 0, 0, 0, false);
         }
 
         private void ECtrl_startClicked(object sender, EventArgs e)
         {
-            MainV2.comPort.doCommand(MAVLink.MAV_CMD.DO_SET_SERVO, (float)Convert.ToInt16(Host.config["jetcontrolch", "10"]), 2000, 0, 0, 0, 0, 0, false);
+            MainV2.comPort.doCommand(MAVLink.MAV_CMD.DO_SET_SERVO, (float)Convert.ToInt16(_jetControlChannel), 2000, 0, 0, 0, 0, 0, false);
         }
 
         private void ECtrl_armClicked(object sender, EventArgs e)
