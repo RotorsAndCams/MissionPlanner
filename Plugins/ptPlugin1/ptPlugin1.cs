@@ -162,6 +162,9 @@ namespace ptPlugin1
         IPEndPoint FTudpEndPoint;
         internal static GMapOverlay FTOverlay = new GMapOverlay();
 
+        private int _telemetryUdpPort;
+        private string _telemetryUdpPortKey = "Protar_TelemUDPPort";
+
         private int _jetControlChannel;
         private string _jetControlChannelKey = "jetcontrolch";
 
@@ -595,6 +598,9 @@ namespace ptPlugin1
             chuteServoOpenPWM = Host.config.GetInt32("chuteServoOpenPWM", 1100);
             Host.config["chuteServoOpenPWM"] = chuteServoOpenPWM.ToString();
 
+            // Get telemetry UDP port from config
+            _telemetryUdpPort = Host.config.GetInt32(_telemetryUdpPortKey, 19729);
+            Host.config[_telemetryUdpPortKey] = _telemetryUdpPort.ToString();
 
             // Set up Fligh Termination UDP packet receiving 
             FTudpEndPoint = new IPEndPoint(IPAddress.Parse("192.168.69.100"), 19728);
@@ -865,7 +871,7 @@ namespace ptPlugin1
             try
             {
                 UdpClient client = new UdpClient();
-                IPEndPoint ip = new IPEndPoint(IPAddress.Broadcast, 19729);
+                IPEndPoint ip = new IPEndPoint(IPAddress.Broadcast, _telemetryUdpPort);
                 byte[] bytes = Encoding.ASCII.GetBytes(message);
                 client.Send(bytes, bytes.Length, ip);
                 client.Close();
