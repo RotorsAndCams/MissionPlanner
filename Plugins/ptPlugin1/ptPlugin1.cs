@@ -140,8 +140,10 @@ namespace ptPlugin1
 
         string actualPanel = "";
 
-        public int chuteServo = 9;
-        public int chuteServoOpenPWM = 1100;
+        public int chuteServo;
+        private string _chuteServoKey = "chuteServo";
+        public int chuteServoOpenPWM;
+        private string _chuteServoOpenPWMKey = "chuteServoOpenPWM";
 
         internal GMapMarker markerLanding;
         internal GMapMarker markerWaiting;
@@ -581,11 +583,11 @@ namespace ptPlugin1
             #endregion
 
             // Get servo settings from config
-            chuteServo = Settings.Instance.GetInt32("chuteServo", 9);
-            Settings.Instance["chuteServo"] = chuteServo.ToString();
+            chuteServo = Host.config.GetInt32(_chuteServoKey, 9);
+            Host.config[_chuteServoKey] = chuteServo.ToString();
+            chuteServoOpenPWM = Host.config.GetInt32("chuteServoOpenPWM", 1100);
+            Host.config["chuteServoOpenPWM"] = chuteServoOpenPWM.ToString();
 
-            chuteServoOpenPWM = Settings.Instance.GetInt32("chuteServoOpenPWM", 1100);
-            Settings.Instance["chuteServoOpenPWM"] = chuteServoOpenPWM.ToString();
 
             // Set up Fligh Termination UDP packet receiving 
             FTudpEndPoint = new IPEndPoint(IPAddress.Parse("192.168.69.100"), 19728);
