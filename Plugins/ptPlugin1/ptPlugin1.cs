@@ -44,7 +44,7 @@ namespace ptPlugin1
         AutoOpenEnabled
     }
 
-    public class situation
+    public class Situation
     {
         public int sysid1;
         public PointLatLngAlt pos1;
@@ -65,7 +65,7 @@ namespace ptPlugin1
     [PreventTheming]
     public partial class ptPlugin1 : Plugin
     {
-        public situation sit = new situation();
+        public Situation sit = new Situation();
         
         public static int plane1ID = 0;
         public static int plane2ID = 0;    
@@ -173,6 +173,8 @@ namespace ptPlugin1
         private int _jetControlChannel;
         private string _jetControlChannelKey = "jetcontrolch";
 
+        #region Plugin info
+
         public override string Name
         {
             get { return "ptPlugin1"; }
@@ -185,15 +187,16 @@ namespace ptPlugin1
 
         public override string Author
         {
-            get { return "Schaffer Andras"; }
+            get { return "RotorsAndCams"; }
         }
+
+        #endregion
 
         // Init called when the plugin dll is loaded
         //[DebuggerHidden]
         public override bool Init()
         {
             loopratehz = 5;  // Loop runs every second (The value is in Hertz, so 2 means every 500ms, 0.1f means every 10 second...) 
-
             return true;	 // If it is false then plugin will not load
         }
 
@@ -311,9 +314,9 @@ namespace ptPlugin1
             }));
 
             // Check undocked status
-            if (Settings.Instance["aMainDocked"] != null)
+            if (Host.config.ContainsKey("aMainDocked"))
             {
-                bool aMainDocked = Settings.Instance.GetBoolean("aMainDocked");
+                bool aMainDocked = Host.config.GetBoolean("aMainDocked");
                 if (!aMainDocked)
                 {
                     annunciator1_undock(this, new EventArgs());
@@ -812,7 +815,8 @@ namespace ptPlugin1
                 client.Send(bytes, bytes.Length, ip);
                 client.Close();
             }
-            catch {
+            catch
+            {
                 CustomMessageBox.Show("Unable to send fleet setup to the Flight Termination Unit. Check network connectivity!");
             }
         }
@@ -893,7 +897,7 @@ namespace ptPlugin1
         // Returns true if this is a supervisor station, if there is no setting then it returns false by default
         public bool isSupervisor()
         {
-            bool val = Settings.Instance.GetBoolean("Protar_Supervisor", false);
+            bool val = Host.config.GetBoolean("Protar_Supervisor", false);
             return val;
         }
 
@@ -1272,7 +1276,7 @@ namespace ptPlugin1
 
             float wd = 0;
 
-            if (Convert.ToBoolean(Host.config["reverse_winddir_drag", "true"]))
+            if (Convert.ToBoolean(Host.config.GetBoolean("reverse_winddir_drag", true)))
             {
                 wd = wrap360(lc.WindDirection - 180);
             }
@@ -1468,8 +1472,8 @@ namespace ptPlugin1
                 if (winddir < 0 || winddir > 359) winddir = Host.cs.g_wind_dir;
             }
 
-            float landReverse = Settings.Instance.GetFloat("LandDirectionReverse", 0);  // Load or default
-            Settings.Instance["LandDirectionReverse"] = landReverse.ToString();         // Save
+            float landReverse = Host.config.GetFloat("LandDirectionReverse", 0);  // Load or default
+            Host.config["LandDirectionReverse"] = landReverse.ToString();         // Save
    
             PointLatLngAlt lp = Host.FDMenuMapPosition;
             lc.updateLandingData(lp, wrap360(winddir - landReverse), Host.cs.g_wind_vel, (int)MainV2.comPort.MAV.param["WP_LOITER_RAD"].Value);
@@ -1955,8 +1959,8 @@ namespace ptPlugin1
             MainV2.instance.panel1.Dock = DockStyle.Top;
             MainV2.instance.panel1.Visible = false;
             aMain1.Invalidate();
-            Settings.Instance["aMainDocked"] = "false";
-            Settings.Instance.Save();
+            Host.config["aMainDocked"] = "false";
+            Host.config.Save();
             annunciatorForm.Show();
         }
 
@@ -1970,8 +1974,8 @@ namespace ptPlugin1
             MainV2.instance.panel1.Visible = true;
             aMain1.Size = MainV2.instance.panel1.Size;
             //annunciatorUndocked = false;
-            Settings.Instance["aMainDocked"] = "true";
-            Settings.Instance.Save();
+            Host.config["aMainDocked"] = "true";
+            Host.config.Save();
             (sender as Form).Dispose();
         }
 
