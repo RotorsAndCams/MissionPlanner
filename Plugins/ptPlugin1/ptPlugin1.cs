@@ -390,6 +390,7 @@ namespace ptPlugin1
             _jetControlChannel = Host.config.GetInt32(_jetControlChannelKey, 10);
             Host.config[_jetControlChannelKey] = _jetControlChannel.ToString();
 
+            // Set up det control button events
             eCtrl.startClicked += ECtrl_startClicked;
             eCtrl.stopClicked += ECtrl_stopClicked;
             eCtrl.emergencyClicked += ECtrl_emergencyClicked;
@@ -530,7 +531,9 @@ namespace ptPlugin1
             Host.MainForm.FlightData.tabControlactions.TabPages.Add(overviewPage);
 
             #region FTDataDisplaySetup
+
             // Flight termination data display setup
+
             ftPage.Text = "Flight Termination System";
             ftPage.Name = "FlightTermViewTab";
             ftPage.Controls.Add(tlFT);
@@ -604,7 +607,9 @@ namespace ptPlugin1
             ((Label)tlFT.GetControlFromPosition(0, 10)).Text = "Show on Map";
 
             Host.MainForm.FlightData.tabControlactions.TabPages.Add(ftPage);
+            
             // End of flight termination data display setup
+            
             #endregion
 
             // Get servo settings from config
@@ -632,7 +637,7 @@ namespace ptPlugin1
             FTOverlay.Id = "FTO";
             Host.FDGMapControl.Overlays.Add(FTOverlay);
 
-            return true;     // If it is false plugin will not start (loop will not called)
+            return true; // If it is false plugin will not start (loop will not called)
         }
 
         private void ProcessFTMessage(IAsyncResult result)
@@ -640,17 +645,17 @@ namespace ptPlugin1
             try
             {
                 // Get message
-                byte[] m = FTudpClient.EndReceive(result, ref FTudpEndPoint);
+                byte[] message = FTudpClient.EndReceive(result, ref FTudpEndPoint);
 
                 // Restart listener
                 FTudpClient.BeginReceive(new AsyncCallback(ProcessFTMessage), null);
 
                 // Process the message
-                Console.WriteLine("FT Message received, SysID:" + m[0].ToString());
+                Console.WriteLine("FT Message received, SysID:" + message[0].ToString());
 
-                int sysid = m[0];
+                int sysid = message[0];
                 string ftstate;
-                switch (m[1])
+                switch (message[1])
                 {
                     case 0:
                         ftstate = "PRESS TEST";
@@ -670,7 +675,7 @@ namespace ptPlugin1
                 }
 
                 string fltmode;
-                switch (m[15])
+                switch (message[15])
                 {
                     case 1:
                         fltmode = "Circle";
@@ -697,35 +702,35 @@ namespace ptPlugin1
                         fltmode = "Guided";
                         break;
                     default:
-                        fltmode = "Mode " + m[14].ToString();
+                        fltmode = "Mode " + message[14].ToString();
                         break;
                 }
 
                 byte[] conv_int32 = { 0, 0, 0, 0 };
-                conv_int32[0] = m[2]; conv_int32[1] = m[3]; conv_int32[2] = m[4]; conv_int32[3] = m[5];
+                conv_int32[0] = message[2]; conv_int32[1] = message[3]; conv_int32[2] = message[4]; conv_int32[3] = message[5];
                 float pos_lat = (float)(BitConverter.ToInt32(conv_int32, 0) / 1e7);
-                conv_int32[0] = m[6]; conv_int32[1] = m[7]; conv_int32[2] = m[8]; conv_int32[3] = m[9];
+                conv_int32[0] = message[6]; conv_int32[1] = message[7]; conv_int32[2] = message[8]; conv_int32[3] = message[9];
                 float pos_lon = (float)(BitConverter.ToInt32(conv_int32, 0) / 1e7);
 
-                int airspeed = m[14];
+                int airspeed = message[14];
                 byte[] c = { 0, 0 };
-                c[0] = m[10]; c[1] = m[11];
+                c[0] = message[10]; c[1] = message[11];
                 int alt_amsl = BitConverter.ToInt16(c, 0);
-                c[0] = m[12]; c[1] = m[13];
+                c[0] = message[12]; c[1] = message[13];
                 int heading = BitConverter.ToInt16(c, 0);
 
                 MainV2.instance.BeginInvoke((MethodInvoker)(() =>
                 {
-                    ((Label)tlFT.GetControlFromPosition(m[18] + 1, 0)).Text = sysid.ToString();
-                    ((Label)tlFT.GetControlFromPosition(m[18] + 1, 1)).Text = ftstate;
-                    ((Label)tlFT.GetControlFromPosition(m[18] + 1, 2)).Text = airspeed.ToString() + " m/s";
-                    ((Label)tlFT.GetControlFromPosition(m[18] + 1, 3)).Text = pos_lat.ToString("F6");
-                    ((Label)tlFT.GetControlFromPosition(m[18] + 1, 4)).Text = pos_lon.ToString("F6");
-                    ((Label)tlFT.GetControlFromPosition(m[18] + 1, 5)).Text = alt_amsl.ToString() + " m";
-                    ((Label)tlFT.GetControlFromPosition(m[18] + 1, 6)).Text = heading.ToString() + " deg";
-                    ((Label)tlFT.GetControlFromPosition(m[18] + 1, 7)).Text = fltmode;
-                    ((Label)tlFT.GetControlFromPosition(m[18] + 1, 8)).Text = m[16].ToString() + "dBm";
-                    ((Label)tlFT.GetControlFromPosition(m[18] + 1, 9)).Text = ((sbyte)m[17]).ToString() + "dBm";
+                    ((Label)tlFT.GetControlFromPosition(message[18] + 1, 0)).Text = sysid.ToString();
+                    ((Label)tlFT.GetControlFromPosition(message[18] + 1, 1)).Text = ftstate;
+                    ((Label)tlFT.GetControlFromPosition(message[18] + 1, 2)).Text = airspeed.ToString() + " m/s";
+                    ((Label)tlFT.GetControlFromPosition(message[18] + 1, 3)).Text = pos_lat.ToString("F6");
+                    ((Label)tlFT.GetControlFromPosition(message[18] + 1, 4)).Text = pos_lon.ToString("F6");
+                    ((Label)tlFT.GetControlFromPosition(message[18] + 1, 5)).Text = alt_amsl.ToString() + " m";
+                    ((Label)tlFT.GetControlFromPosition(message[18] + 1, 6)).Text = heading.ToString() + " deg";
+                    ((Label)tlFT.GetControlFromPosition(message[18] + 1, 7)).Text = fltmode;
+                    ((Label)tlFT.GetControlFromPosition(message[18] + 1, 8)).Text = message[16].ToString() + "dBm";
+                    ((Label)tlFT.GetControlFromPosition(message[18] + 1, 9)).Text = ((sbyte)message[17]).ToString() + "dBm";
                 }));
 
                 bool showplanes = ((CheckBox)tlFT.GetControlFromPosition(1, 10)).Checked;
@@ -756,10 +761,9 @@ namespace ptPlugin1
                     FTOverlay.Markers.Add(new_marker);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Console.WriteLine("Catch!!!");
-
+                Console.WriteLine($"Flight Termination message parse error: {ex.Message}");
             }
         }
 
@@ -846,11 +850,11 @@ namespace ptPlugin1
                 gotohere.lat = Host.cs.TargetLocation.Lat;
                 gotohere.lng = Host.cs.TargetLocation.Lng;
 
-                Host.comPort.setMode("FBWA");
+                Host.comPort.setMode((byte)Host.comPort.sysidcurrent, (byte)Host.comPort.compidcurrent, "FBWA");
 
                 try
                 {
-                    MainV2.comPort.setGuidedModeWP(gotohere);
+                    Host.comPort.setGuidedModeWP((byte)Host.comPort.sysidcurrent, (byte)Host.comPort.compidcurrent, gotohere);
                 }
                 catch (Exception ex)
                 {
@@ -874,11 +878,11 @@ namespace ptPlugin1
         {
             if (Host.cs.connected)
             {
-                var speed = MainV2.comPort.MAV.param["TRIM_ARSPD_CM"].Value / 100;
+                var speed = Host.comPort.MAV.param["TRIM_ARSPD_CM"].Value / 100;
                 if (speed <= 0) return;
                 try
                 {
-                    MainV2.comPort.doCommandAsync(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid,
+                    Host.comPort.doCommandAsync((byte)Host.comPort.sysidcurrent, (byte)Host.comPort.compidcurrent,
                             MAVLink.MAV_CMD.DO_CHANGE_SPEED, 0, (float)speed, 0, 0, 0, 0, 0);
                 }
                 catch
@@ -899,13 +903,6 @@ namespace ptPlugin1
                 client.Close();
             }
             catch { }
-        }
-
-        // Returns true if this is a supervisor station, if there is no setting then it returns false by default
-        public bool isSupervisor()
-        {
-            bool val = Host.config.GetBoolean("Protar_Supervisor", false);
-            return val;
         }
 
         // Loop is called in regular intervalls (set by loopratehz)
@@ -933,9 +930,9 @@ namespace ptPlugin1
 
                 #region MessagesBox
 
-                //Message box update
+                // Message box update
 
-                //Iterate over all ports and put every message to the common messages box
+                // Iterate over all ports and put every message to the common messages box
 
                 foreach (var port in MainV2.Comports)
                 {
@@ -1086,8 +1083,10 @@ namespace ptPlugin1
                 #endregion
 
                 #region GCSPower
+
                 PowerStatus pwr = SystemInformation.PowerStatus;
                 bp.setGcsVoltage(pwr.BatteryLifePercent, pwr.PowerLineStatus);
+                
                 #endregion
             }
 
@@ -1180,13 +1179,13 @@ namespace ptPlugin1
             {
                 // Wait until we started loitering around the waiting point (+50meter need to check for discrepancies between loiter radius and actual radius
                 Console.WriteLine(Host.cs.Location.GetDistance(lc.WaitingPoint));
-                if (Host.cs.Location.GetDistance(lc.WaitingPoint) <= MainV2.comPort.MAV.param["WP_LOITER_RAD"].Value + 50
+                if (Host.cs.Location.GetDistance(lc.WaitingPoint) <= Host.comPort.MAV.param["WP_LOITER_RAD"].Value + 50
                     && (Host.cs.alt <= lc.LandingAlt + 20))
                 {
                     lc.state = LandState.WaitForSpeed;
                     try
                     {
-                        MainV2.comPort.doCommandAsync(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid,
+                        Host.comPort.doCommandAsync((byte)Host.comPort.sysidcurrent, (byte)Host.comPort.compidcurrent,
                                 MAVLink.MAV_CMD.DO_CHANGE_SPEED, 0, (float)lc.HoldingSpeed, 0, 0, 0, 0, 0);
                     }
                     catch
@@ -1212,7 +1211,7 @@ namespace ptPlugin1
                     // Reduce the airspeed further during approach
                     try
                     {
-                        MainV2.comPort.doCommandAsync(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid,
+                        Host.comPort.doCommandAsync((byte)Host.comPort.sysidcurrent, (byte)Host.comPort.compidcurrent,
                                 MAVLink.MAV_CMD.DO_CHANGE_SPEED, 0, (float)lc.ApproachSpeed, 0, 0, 0, 0, 0);
                     }
                     catch
@@ -1231,7 +1230,7 @@ namespace ptPlugin1
 
                     try
                     {
-                        MainV2.comPort.setGuidedModeWP(gotohere);
+                        Host.comPort.setGuidedModeWP((byte)Host.comPort.sysidcurrent, (byte)Host.comPort.compidcurrent, gotohere);
                         lc.state = LandState.GoToLand;
                     }
                     catch (Exception ex)
@@ -1245,12 +1244,12 @@ namespace ptPlugin1
             // Switch from landingpoint to target point if we are within loiter radius + 200meter
             if (lc.state == LandState.GoToLand)
             {
-                if (Host.cs.Location.GetDistance(lc.LandingPoint) <= MainV2.comPort.MAV.param["WP_LOITER_RAD"].Value + lc.FinalApproachDistance)
+                if (Host.cs.Location.GetDistance(lc.LandingPoint) <= Host.comPort.MAV.param["WP_LOITER_RAD"].Value + lc.FinalApproachDistance)
                 {
                     // Reduce the airspeed further during final approach
                     try
                     {
-                        MainV2.comPort.doCommandAsync(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid,
+                        Host.comPort.doCommandAsync((byte)Host.comPort.sysidcurrent, (byte)Host.comPort.compidcurrent,
                                 MAVLink.MAV_CMD.DO_CHANGE_SPEED, 0, (float)lc.FinalApproachSpeed, 0, 0, 0, 0, 0);
                     }
                     catch
@@ -1267,7 +1266,7 @@ namespace ptPlugin1
 
                     try
                     {
-                        MainV2.comPort.setGuidedModeWP(gotohere);
+                        Host.comPort.setGuidedModeWP((byte)Host.comPort.sysidcurrent, (byte)Host.comPort.compidcurrent, gotohere);
                     }
                     catch { }
 
@@ -1304,7 +1303,7 @@ namespace ptPlugin1
                 if (lc.chute == ChuteState.AutoOpenEnabled)
                 {
                     Host.cs.messageHigh = "OPEN OPEN OPEN";
-                    MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_SERVO, chuteServo, chuteServoOpenPWM, 0, 0, 0, 0, 0);
+                    Host.comPort.doCommand((byte)Host.comPort.sysidcurrent, (byte)Host.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_SERVO, chuteServo, chuteServoOpenPWM, 0, 0, 0, 0, 0);
                     SystemSounds.Exclamation.Play();
                 }
                 else
@@ -1333,7 +1332,7 @@ namespace ptPlugin1
         {
             try
             {
-                MainV2.comPort.doCommandAsync(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid,
+                Host.comPort.doCommandAsync((byte)Host.comPort.sysidcurrent, (byte)Host.comPort.compidcurrent,
                         MAVLink.MAV_CMD.DO_CHANGE_SPEED, 0, (float)lc.HoldingSpeed, 0, 0, 0, 0, 0);
             }
             catch
@@ -1355,7 +1354,7 @@ namespace ptPlugin1
             // Reduce the airspeed further before reaching the turn
             try
             {
-                MainV2.comPort.doCommandAsync(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid,
+                Host.comPort.doCommandAsync((byte)Host.comPort.sysidcurrent, (byte)Host.comPort.compidcurrent,
                         MAVLink.MAV_CMD.DO_CHANGE_SPEED, 0, (float)lc.HoldingSpeed, 0, 0, 0, 0, 0);
             }
             catch
@@ -1374,7 +1373,7 @@ namespace ptPlugin1
             };
             try
             {
-                MainV2.comPort.setGuidedModeWP(gotohere);
+                Host.comPort.setGuidedModeWP((byte)Host.comPort.sysidcurrent, (byte)Host.comPort.compidcurrent, gotohere);
             }
             catch (Exception ex)
             {
@@ -1388,17 +1387,17 @@ namespace ptPlugin1
 
         private void ECtrl_emergencyClicked(object sender, EventArgs e)
         {
-            MainV2.comPort.doCommand(MAVLink.MAV_CMD.DO_SET_SERVO, (float)Convert.ToInt16(_jetControlChannel), 1000, 0, 0, 0, 0, 0, false);
+            Host.comPort.doCommand((byte)Host.comPort.sysidcurrent, (byte)Host.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_SERVO, (float)Convert.ToInt16(_jetControlChannel), 1000, 0, 0, 0, 0, 0, false);
         }
 
         private void ECtrl_stopClicked(object sender, EventArgs e)
         {
-            MainV2.comPort.doCommand(MAVLink.MAV_CMD.DO_SET_SERVO, (float)Convert.ToInt16(_jetControlChannel), 1500, 0, 0, 0, 0, 0, false);
+            Host.comPort.doCommand((byte)Host.comPort.sysidcurrent, (byte)Host.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_SERVO, (float)Convert.ToInt16(_jetControlChannel), 1500, 0, 0, 0, 0, 0, false);
         }
 
         private void ECtrl_startClicked(object sender, EventArgs e)
         {
-            MainV2.comPort.doCommand(MAVLink.MAV_CMD.DO_SET_SERVO, (float)Convert.ToInt16(_jetControlChannel), 2000, 0, 0, 0, 0, 0, false);
+            Host.comPort.doCommand((byte)Host.comPort.sysidcurrent, (byte)Host.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_SERVO, (float)Convert.ToInt16(_jetControlChannel), 2000, 0, 0, 0, 0, 0, false);
         }
 
         private void ECtrl_armClicked(object sender, EventArgs e)
@@ -1423,8 +1422,8 @@ namespace ptPlugin1
                     sb.AppendLine(Encoding.ASCII.GetString(((MAVLink.mavlink_statustext_t)message.data).text)
                         .TrimEnd('\0'));
                     return true;
-                }, (byte)Host.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent);
-                bool ans = Host.comPort.doARM(!isitarmed);
+                }, (byte)Host.comPort.sysidcurrent, (byte)Host.comPort.compidcurrent);
+                bool ans = Host.comPort.doARM((byte)Host.comPort.sysidcurrent, (byte)Host.comPort.compidcurrent, !isitarmed);
                 Host.comPort.UnSubscribeToPacketType(sub);
                 if (ans == false)
                 {
@@ -1435,7 +1434,7 @@ namespace ptPlugin1
                             CustomMessageBox.MessageBoxIcon.Exclamation, "Force " + action, "Cancel") ==
                         CustomMessageBox.DialogResult.Yes)
                     {
-                        ans = Host.comPort.doARM(!isitarmed, true);
+                        ans = Host.comPort.doARM((byte)Host.comPort.sysidcurrent, (byte)Host.comPort.compidcurrent, !isitarmed, true);
                         if (ans == false)
                         {
                             CustomMessageBox.Show("ARM request rejected by MAV", "Error");
@@ -1453,7 +1452,7 @@ namespace ptPlugin1
         {
 
             byte[] c = Encoding.Default.GetBytes("P");
-            MainV2.comPort.sendPacket(new MAVLink.mavlink_named_value_float_t() { name = c, time_boot_ms = 0, value = (float)plControl.igniteMask }, MainV2.comPort.sysidcurrent, MainV2.comPort.compidcurrent);
+            Host.comPort.sendPacket(new MAVLink.mavlink_named_value_float_t() { name = c, time_boot_ms = 0, value = (float)plControl.igniteMask }, Host.comPort.sysidcurrent, Host.comPort.compidcurrent);
 
             Console.WriteLine("Payload ignite:{0}", plControl.igniteMask);
 
@@ -1483,7 +1482,7 @@ namespace ptPlugin1
             Host.config["LandDirectionReverse"] = landReverse.ToString();         // Save
    
             PointLatLngAlt lp = Host.FDMenuMapPosition;
-            lc.updateLandingData(lp, wrap360(winddir - landReverse), Host.cs.g_wind_vel, (int)MainV2.comPort.MAV.param["WP_LOITER_RAD"].Value);
+            lc.updateLandingData(lp, wrap360(winddir - landReverse), Host.cs.g_wind_vel, (int)Host.comPort.MAV.param["WP_LOITER_RAD"].Value);
    
             landingOverlay.Markers.Clear();
             landingOverlay.Routes.Clear();
@@ -1514,13 +1513,13 @@ namespace ptPlugin1
 
         private void Pitot_calibrateClicked(object sender, EventArgs e)
         {
-            if (!MainV2.comPort.MAV.cs.connected)
+            if (!Host.comPort.MAV.cs.connected)
             {
                 CustomMessageBox.Show("You have to connect first!", "Action", MessageBoxButtons.OK);
                 return;
             }
 
-            if (MainV2.comPort.MAV.cs.armed)
+            if (Host.comPort.MAV.cs.armed)
             {
                 CustomMessageBox.Show("You cannot do it while aircraft is armed!", "Action", MessageBoxButtons.OK);
                 return;
@@ -1540,7 +1539,7 @@ namespace ptPlugin1
                     param3 = 1; // baro / airspeed
                     var cmd = (MAVLink.MAV_CMD)Enum.Parse(typeof(MAVLink.MAV_CMD), "Preflight_Calibration".ToUpper());
 
-                    if (!MainV2.comPort.doCommand(cmd, param1, param2, param3, 0, 0, 0, 0))
+                    if (!Host.comPort.doCommand(cmd, param1, param2, param3, 0, 0, 0, 0))
                     {
                         CustomMessageBox.Show("Calibration Failed" + cmd, "ERROR");
                     }
@@ -1966,7 +1965,7 @@ namespace ptPlugin1
             MainV2.instance.panel1.Dock = DockStyle.Top;
             MainV2.instance.panel1.Visible = false;
             aMain1.Invalidate();
-            Host.config["aMainDocked"] = "false";
+            Host.config["aMainDocked"] = false.ToString();
             Host.config.Save();
             annunciatorForm.Show();
         }
@@ -1981,7 +1980,7 @@ namespace ptPlugin1
             MainV2.instance.panel1.Visible = true;
             aMain1.Size = MainV2.instance.panel1.Size;
             //annunciatorUndocked = false;
-            Host.config["aMainDocked"] = "true";
+            Host.config["aMainDocked"] = true.ToString();
             Host.config.Save();
             (sender as Form).Dispose();
         }
