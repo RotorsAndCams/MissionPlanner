@@ -173,6 +173,9 @@ namespace ptPlugin1
         private int _jetControlChannel;
         private string _jetControlChannelKey = "jetcontrolch";
 
+        private bool _isSupervisor;
+        private string _isSupervisorKey = "Protar_Supervisor";
+
         #region Plugin info
 
         public override string Name
@@ -203,6 +206,10 @@ namespace ptPlugin1
         // Loaded called after the plugin dll successfully loaded
         public override bool Loaded()
         {
+            // Get supervisor state from config
+            _isSupervisor = Host.config.GetBoolean(_isSupervisorKey, false);
+            Host.config[_isSupervisorKey] = _isSupervisor.ToString();
+
             tsLandingPoint.Text = "Set Landing Point";
             tsLandingPoint.Click += TsLandingPoint_Click;
             Host.FDMenuMap.Items.Add(tsLandingPoint);
@@ -338,7 +345,7 @@ namespace ptPlugin1
             MainV2.instance.BeginInvoke((MethodInvoker)(() =>
             {
                 //If this is not a supervisor then you have to setup only one ID
-                if (!isSupervisor())
+                if (!_isSupervisor)
                 {
                     aMain1.Active = true;
                     aMain2.Active = false;
@@ -782,7 +789,7 @@ namespace ptPlugin1
             MainV2.instance.BeginInvoke((MethodInvoker)(() =>
             {
                 // If this is not a supervisor then you have to setup only one ID
-                if (!isSupervisor())
+                if (!_isSupervisor)
                 {
                     aMain1.Active = true;
                     aMain2.Active = false;
@@ -915,9 +922,9 @@ namespace ptPlugin1
                 updateNotifications();
                 update_gauges();
 
-                if (isSupervisor()) updateOverview();
+                if (_isSupervisor) updateOverview();
 
-                if (isSupervisor()) sendUDPBroadcast(sit.ToJSON());
+                if (_isSupervisor) sendUDPBroadcast(sit.ToJSON());
 
                 MainV2.instance.BeginInvoke((MethodInvoker)(() =>
                 {
