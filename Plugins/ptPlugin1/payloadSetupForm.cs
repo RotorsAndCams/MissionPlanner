@@ -13,7 +13,6 @@ namespace ptPlugin1
 {
     public partial class payloadSetupForm : Form
     {
-
         public List<Payload> payloadStatus;
 
         public payloadSetupForm()
@@ -29,11 +28,9 @@ namespace ptPlugin1
             this.Close();
         }
 
-
         public void updateAll(List<Payload> pl)
         {
             payloadsetup1.updateAll(pl);
         }
-
     }
 }

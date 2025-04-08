@@ -35,8 +35,6 @@ namespace ptPlugin1
 {
     public partial class TimedWpConsole : Form
     {
-
-
         public int selectedWaypoint = 0;
         public int routetime = 0;
 
@@ -73,7 +71,6 @@ namespace ptPlugin1
             selectedWaypoint = Int16.Parse((string)dgV.CurrentRow.Cells[WP.Index].Value.ToString());
             routetime = Int16.Parse((string)dgV.CurrentRow.Cells[Time1.Index].Value.ToString());
             lTarget.Text = $"WP {selectedWaypoint} reach time";
-
         }
     }
 }

@@ -11,12 +11,6 @@ namespace MissionPlanner.Controls
     [PreventTheming]
     public class utButton : Button
     {
-
-
-        public utButton()
-        {
-
-        }
-
+        public utButton() {}
     }
 }

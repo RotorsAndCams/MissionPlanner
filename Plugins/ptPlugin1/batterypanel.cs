@@ -27,12 +27,10 @@ namespace ptPlugin1
             setPayloadVoltage(payload);
             setMainVoltage(main);
             setGcsVoltage(gcs,PowerLineStatus.Offline);
-
         }
 
         public void setServo1Voltage(float v)
         {
-
             MissionPlanner.MainV2.instance.BeginInvoke((MethodInvoker)(() =>
             {
                 servo1 = v;
@@ -93,10 +91,8 @@ namespace ptPlugin1
 
         public void setGcsVoltage(float v, PowerLineStatus lineStat)
         {
-
             MissionPlanner.MainV2.instance.BeginInvoke((MethodInvoker)(() =>
             {
-
                 if (lineStat == PowerLineStatus.Online)
                 {
                     gaugeGCS.Cap_Idx = 1;
@@ -120,17 +116,13 @@ namespace ptPlugin1
 
                 gaugeGCS.Value0 = v;
             }));
-
         }
-
 
         //Returns   0 for NOMINAL
         //          1 for WARNING
         //          2 for ERROR
-
         public byte getGenericStatus()
         {
-
             byte retval = 0;
 
             switch (servo1)
@@ -212,7 +204,5 @@ namespace ptPlugin1
             }
             return retval;
         }
-
-
     }
 }

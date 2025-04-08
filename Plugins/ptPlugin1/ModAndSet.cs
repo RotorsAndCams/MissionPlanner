@@ -33,7 +33,6 @@ namespace ptPlugin1
             get { return myButton1; }
         }
 
-
         [System.ComponentModel.Browsable(true)]
         public String UnitText
         {

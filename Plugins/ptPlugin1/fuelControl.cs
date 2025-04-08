@@ -39,7 +39,6 @@ namespace ptPlugin1
         {
             MissionPlanner.MainV2.instance.BeginInvoke((MethodInvoker)(() =>
             {
-
                 remainingFuel = loaded - consumed;
                 if (remainingFuel < 0) remainingFuel = 0;
 
@@ -60,7 +59,6 @@ namespace ptPlugin1
             var input = "27";
             if (InputBox.Show("Enter Loaded Fuel", "Please enter loaded fuel", ref input) == System.Windows.Forms.DialogResult.OK)
             {
-
                 if (!Int32.TryParse(input, out loadedFuel))
                 {
                     loadedFuel = 0;
@@ -69,7 +67,6 @@ namespace ptPlugin1
             }
 
             this.OnLoadedFuelClicked(EventArgs.Empty);
-
         }
     }
 }

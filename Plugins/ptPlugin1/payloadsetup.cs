@@ -60,9 +60,6 @@ namespace MissionPlanner.Controls
                         default:
                             break;
                     }
-
-
-
                 }
             }
             redrawControls();
@@ -86,7 +83,6 @@ namespace MissionPlanner.Controls
 
         public void setPayloads(PayloadPos position, PayloadType type)
         {
-
             foreach (Payload p in payloadSetup)
             {
                 if (p.pos == position) p.type = type;
@@ -96,7 +92,6 @@ namespace MissionPlanner.Controls
 
         public void redrawControls()
         {
-
             foreach (Payload p in payloadSetup)
             {
                 switch (p.type)
@@ -134,13 +129,10 @@ namespace MissionPlanner.Controls
 
             btnUpdate.ForeColor = Color.DarkSlateGray;
             btnUpdate.BackColor = Color.Red;
-
-
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
-
             redrawControls();
             this.OnUpdateClicked(EventArgs.Empty);
         }
@@ -153,10 +145,5 @@ namespace MissionPlanner.Controls
                 handler(this, e);
             }
         }
-
-
-
-
     }
-
 }

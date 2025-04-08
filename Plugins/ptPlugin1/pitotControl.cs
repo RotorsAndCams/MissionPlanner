@@ -12,9 +12,6 @@ namespace ptPlugin1
 {
     public partial class pitotControl : UserControl
     {
-
-
-
         public event EventHandler calibrateClicked;
 
         public pitotControl()
@@ -22,13 +19,12 @@ namespace ptPlugin1
             InitializeComponent();
         }
 
-        //Set Data
+        // Set Data
         public void setData(float pitotTemp, float ambientTemp, float targetTemp, float duty)
         {
             MissionPlanner.MainV2.instance.BeginInvoke((MethodInvoker)(() =>
             {
-
-                //range check
+                // Range check
                 if (duty < 0) duty = 0;
                 else if (duty > 255) duty = 255;
 
@@ -40,10 +36,8 @@ namespace ptPlugin1
                 gaugeAmbientTemp.CapText = ambientTemp.ToString("F0") + "C°";
                 gaugeAmbientTemp.Value0 = ambientTemp;
                 heatPower.Value = (int)duty;
-
             }));
         }
-
 
         protected virtual void OncalibrateClicked(EventArgs e)
         {
@@ -59,5 +53,4 @@ namespace ptPlugin1
             this.OncalibrateClicked(EventArgs.Empty);
         }
     }
-
 }

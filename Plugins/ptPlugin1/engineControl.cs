@@ -12,20 +12,15 @@ namespace ptPlugin1
 {
     public partial class engineControl : UserControl
     {
-
-
         public event EventHandler armClicked;
-
         public event EventHandler startClicked;
         public event EventHandler stopClicked;
         public event EventHandler emergencyClicked;
-
 
         public engineControl()
         {
             InitializeComponent();
         }
-
 
         protected virtual void OnArmClicked(EventArgs e)
         {
@@ -35,7 +30,6 @@ namespace ptPlugin1
                 handler(this, e);
             }
         }
-
 
         protected virtual void OnStartClicked(EventArgs e)
         {
@@ -72,7 +66,6 @@ namespace ptPlugin1
             }));
         }
 
-
         public void setThrFuel(float thr, float fuel_flow, float used_fuel)
         {
             MissionPlanner.MainV2.instance.BeginInvoke((MethodInvoker)(() =>
@@ -83,20 +76,15 @@ namespace ptPlugin1
             }));
         }
 
-
-
         public void setRpmEgt(float rpm, float egt)
         {
-
             MissionPlanner.MainV2.instance.BeginInvoke((MethodInvoker)(() =>
             {
-
                 engineRpmGauge.Value0 = rpm / 1000;
                 engineRpmGauge.Value1 = rpm / 1000;
 
                 engineRpmGauge.Cap_Idx = 1;
                 engineRpmGauge.CapText = rpm.ToString("F0");
-
 
                 engineTempGauge.Value0 = egt;
                 engineTempGauge.Value1 = egt;
@@ -138,7 +126,6 @@ namespace ptPlugin1
 
                 string engineStat;
                 
-
                 switch ((stat & 0xF8))
                 {
                     case 8:
@@ -214,7 +201,6 @@ namespace ptPlugin1
 
         private void uEngineSTOP_Click(object sender, EventArgs e)
         {
-
             this.OnStopClicked(EventArgs.Empty);
         }
 
