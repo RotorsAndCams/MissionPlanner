@@ -287,7 +287,6 @@ namespace ptPlugin1
 
         private void bEnableDisableChuteOpen_clicked(object sender, EventArgs e)
         {
-            
             if (chute == ChuteState.AutoOpenDisabled)
             {
                 chute = ChuteState.AutoOpenEnabled;

@@ -25,7 +25,6 @@ namespace ptPlugin1
 {
     public partial class fleetSetup : Form
     {
-
         List<int> idList = new List<int>();
 
         public fleetSetup()
@@ -43,14 +42,12 @@ namespace ptPlugin1
             tTail1.Text = "0";
             tTail2.Text = "0";
             tTail3.Text = "0";
-
         }
 
         private void bOK_Click(object sender, EventArgs e)
         {
             int t1 = 0, t2 = 0, t3 = 0;
             string c1, c2, c3;
-
 
             try
             {
@@ -94,7 +91,6 @@ namespace ptPlugin1
 
             //Call MainV2
             MainV2.instance.FlightPlanner.UpdateVehicleIdList(t1, t2, t3);
-
 
             this.Close();
         }

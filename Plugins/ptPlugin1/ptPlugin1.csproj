@@ -116,12 +116,6 @@
     <Compile Include="batterypanel.Designer.cs">
       <DependentUpon>batterypanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="dummyform.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="dummyform.Designer.cs">
-      <DependentUpon>dummyform.cs</DependentUpon>
-    </Compile>
     <Compile Include="ekfStatControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -200,7 +194,6 @@
     <Compile Include="TimedWpConsole.Designer.cs">
       <DependentUpon>TimedWpConsole.cs</DependentUpon>
     </Compile>
-    <Compile Include="UISetup.cs" />
     <Compile Include="unThemedButton.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -229,9 +222,6 @@
   <ItemGroup>
     <EmbeddedResource Include="batterypanel.resx">
       <DependentUpon>batterypanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="dummyform.resx">
-      <DependentUpon>dummyform.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ekfStatControl.resx">
       <DependentUpon>ekfStatControl.cs</DependentUpon>

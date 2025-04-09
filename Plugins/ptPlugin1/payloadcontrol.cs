@@ -14,7 +14,6 @@ namespace MissionPlanner.Controls
     [PreventTheming]
     public partial class payloadcontrol : UserControl
     {
-
         public List<Payload> payloads;
 
         public event EventHandler igniteClicked;
@@ -51,7 +50,6 @@ namespace MissionPlanner.Controls
             //setPayloadType(PayloadPos.right1, PayloadType.flare);
             //setPayloadType(PayloadPos.rear2, PayloadType.smoke);
             //setPayloadType(PayloadPos.left1, PayloadType.flare);
-
         }
 
         private void payload_Click(object sender, EventArgs e)
@@ -150,8 +148,6 @@ namespace MissionPlanner.Controls
 
             btnIgnite.ForeColor = Color.DarkSlateGray;
             btnIgnite.BackColor = Color.Red;
-
-
         }
 
         private void btnIgnite_Click(object sender, EventArgs e)
@@ -163,7 +159,6 @@ namespace MissionPlanner.Controls
                 {
                     igniteMask += p.bitMask;
                     p.state = PayloadState.ignited;
-
                 }
             }
             redrawControls();
@@ -201,17 +196,14 @@ namespace MissionPlanner.Controls
         {
             MissionPlanner.MainV2.instance.BeginInvoke((MethodInvoker)(() =>
             {
-
                 bWarning.Visible = status;
             }));
         }
-
     }
 
     public enum PayloadPos { none = -1, left1 = 0, left2, left3, left4, right1, right2, right3, right4, rear1, rear2 }
     public enum PayloadType { empty, smoke, flare }
     public enum PayloadState { ready, selected, ignited };
-
 
     public class Payload
     {
@@ -237,7 +229,6 @@ namespace MissionPlanner.Controls
             state = PayloadState.ready;
             btn = null;
             bitMask = 0;
-
         }
 
         public Payload(PayloadPos p, Button b, int bit)
@@ -247,15 +238,11 @@ namespace MissionPlanner.Controls
             state = PayloadState.ready;
             btn = b;
             bitMask = bit;
-
         }
 
         public void ignite()
         {
             state = PayloadState.ignited;
         }
-
     }
-
-
 }

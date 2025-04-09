@@ -2,18 +2,11 @@
 using MissionPlanner.Plugin;
 using MissionPlanner.Utilities;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Windows.Forms;
-using System.Diagnostics;
-using MissionPlanner.Controls.PreFlight;
 using MissionPlanner.Controls;
-using System.Linq;
-using GMap.NET.WindowsForms.Markers;
 using MissionPlanner.Maps;
 using GMap.NET;
 using GMap.NET.WindowsForms;
-using System.Drawing;
 using System.Globalization;
 using System.Net.Sockets;
 using System.Net;
@@ -21,7 +14,7 @@ using System.Text;
 
 namespace MapRotate
 {
-    public class situation
+    public class Situation
     {
         public int sysid1;
         public PointLatLngAlt pos1;
@@ -35,15 +28,20 @@ namespace MapRotate
         public PointLatLngAlt pos3;
         public float heading3;
         public float airspeed3;
-
     }
 
     public class MapRotate : Plugin
     {
+        public Situation sit = new Situation();
 
-        public situation sit = new situation();
-        UdpClient udpClient;
-        IPEndPoint udpEndPoint;
+        private int _udpPort;
+        private UdpClient _udpClient;
+        private IPEndPoint _udpEndPoint;
+        private bool _isSupervisor;
+
+        private string _isSupervisorKey = "Protar_Supervisor";
+        private string _telemetryUdpPortKey = "Protar_TelemetryUdpPort";
+
         internal GMapMarkerArrow markerFDcatapult;
         internal GMapMarkerArrow markerFPcatapult;
 
@@ -53,7 +51,9 @@ namespace MapRotate
 
         public int maprotation = 0;
         public PointLatLngAlt catapultLocation;
-       
+
+        #region Plugin info
+
         public override string Name
         {
             get { return "MapRotate/Catapult/Situational"; }
@@ -66,8 +66,10 @@ namespace MapRotate
 
         public override string Author
         {
-            get { return "Andras Schaffer"; }
+            get { return "RotorsAndCams"; }
         }
+
+        #endregion
 
         //[DebuggerHidden]
         public override bool Init()
@@ -80,10 +82,8 @@ namespace MapRotate
             return true;
         }
 
-
-       public override bool Loaded()
+        public override bool Loaded()
         {
-
             ToolStripMenuItem setRotateMenuItem = new ToolStripMenuItem() { Text = "Set Map Rotation" };
             setRotateMenuItem.Click += setRotate_Click;
             Host.FPMenuMap.Items.Add(setRotateMenuItem);
@@ -94,39 +94,40 @@ namespace MapRotate
             Host.FPMenuMap.Items.Add(setCatapultLocationMenuItem);
             Host.FDMenuMap.Items.Add(setCatapultLocationMenuItem);
 
-            if (!isSupervisor())
+            _isSupervisor = Host.config.GetBoolean(_isSupervisorKey, false);
+            Host.config[_isSupervisorKey] = false.ToString();
+            
+            if (!_isSupervisor)
             {
+                // Get UDP port from config
+                _udpPort = Host.config.GetInt32(_telemetryUdpPortKey, 19729);
+                Host.config[_telemetryUdpPortKey] = _udpPort.ToString();
+
                 // Setup UDP broadcast listener
-                udpEndPoint = new IPEndPoint(IPAddress.Any, 19729);
-                udpClient = new UdpClient(19729);
-                udpClient.BeginReceive(new AsyncCallback(ProcessMessage), null);
+                _udpEndPoint = new IPEndPoint(IPAddress.Any, _udpPort);
+                _udpClient = new UdpClient(_udpPort);
+                _udpClient.BeginReceive(new AsyncCallback(ProcessMessage), null);
 
                 Host.FDGMapControl.Overlays.Add(situationOverlay);
             }
-            return true;
-        }
 
-        //Returns true if this is a supervisor station, if there is no setting then it returns false by default
-        public bool isSupervisor()
-        {
-            bool val = Settings.Instance.GetBoolean("Protar_Supervisor", false);
-            return val;
+            return true;
         }
 
         private void ProcessMessage(IAsyncResult result)
         {
             // Get message
-            string message = Encoding.UTF8.GetString(udpClient.EndReceive(result, ref udpEndPoint));
+            string message = Encoding.UTF8.GetString(_udpClient.EndReceive(result, ref _udpEndPoint));
+            
             // Restart listener
-            udpClient.BeginReceive(new AsyncCallback(ProcessMessage), null);
-            // Log message
+            _udpClient.BeginReceive(new AsyncCallback(ProcessMessage), null);
             
             //Check if this is a valid message
             if (message.Contains("sysid1"))
             {
                 //Console.WriteLine("UDP broadcast on port (19729){0}",message);
-                situation sit = new situation();
-                sit = message.FromJSON<situation>();
+                Situation sit = new Situation();
+                sit = message.FromJSON<Situation>();
 
                 situationOverlay.Markers.Clear();
 
@@ -151,21 +152,15 @@ namespace MapRotate
                     markerPlane1.ToolTipMode = MarkerTooltipMode.Always;
                     situationOverlay.Markers.Add(markerPlane1);
                 }
-
-
             }
-
-
         }
 
         private void SetCatapultLocationMenuItem_Click(object sender, EventArgs e)
         {
-
-            var location = "";
-            location = Host.FDMenuMapPosition.Lat.ToString() + ";" + Host.FDMenuMapPosition.Lng.ToString() + ";0";
+            string location = Host.FDMenuMapPosition.Lat.ToString() + ";" + Host.FDMenuMapPosition.Lng.ToString() + ";0";
             InputBox.Show("Enter Catpult Coords", "Please enter the coords 'lat;long;bearing'", ref location);
-            var split = location.Split(';');
-
+            
+            string[] split = location.Split(';');
             if (split.Length == 3)
             {
                 var lat = float.Parse(split[0], CultureInfo.InvariantCulture);
@@ -174,7 +169,6 @@ namespace MapRotate
 
                 markerFDcatapult = new GMapMarkerArrow(new PointLatLng(lat, lng), bearing);
                 markerFPcatapult = new GMapMarkerArrow(new PointLatLng(lat, lng), bearing);
-
 
                 catapultFDOverlay.Markers.Clear();
                 catapultFPOverlay.Markers.Clear();
@@ -193,10 +187,8 @@ namespace MapRotate
             {
                 CustomMessageBox.Show("Invalid position!");
             }
-
         }
 
-        
         private void setRotate_Click(object sender, EventArgs e)
         {
             string txt = "";
@@ -224,6 +216,5 @@ namespace MapRotate
         {
             return true;
         }
-
     }
 }

@@ -10,7 +10,6 @@ namespace MissionPlanner.Controls
 {
     public enum Stat { NOMINAL, WARNING, ALERT, DISABLED, NOTEXIST }
 
-
     //[PreventTheming]
     public partial class annunciator : UserControl
     {
@@ -19,12 +18,9 @@ namespace MissionPlanner.Controls
         public event EventHandler buttonClicked;
         public event EventHandler undock;
 
-
         private bool _contextMenuEnabled;
 
-
         private int _sysid;
-
 
         public int SysID
         {
@@ -32,7 +28,6 @@ namespace MissionPlanner.Controls
             set {
                 _sysid = value;
                 updateNameTag();
-
             }
         }
 
@@ -47,7 +42,6 @@ namespace MissionPlanner.Controls
             }
         }
 
-
         private byte _transparency = 255;
 
         private bool _active;
@@ -61,12 +55,8 @@ namespace MissionPlanner.Controls
                 if (value) { _transparency = 255; }
                       else { _transparency = 128; }
                 changeActiveState();
-                
             }
-
-
         }
-
 
         public bool contextMenuEnabled
         {
@@ -85,14 +75,12 @@ namespace MissionPlanner.Controls
         public string clickedButtonName
         {
             get { return _clickedButtonName; }
-
         }
 
         private bool _blinkStat = true;
 
         //Add 500ms timer
         private System.Timers.Timer timer1 = new System.Timers.Timer(500);
-
 
         private void updateNameTag()
         {
@@ -150,7 +138,6 @@ namespace MissionPlanner.Controls
             }
         }
 
-
         private void doResize()
         {
             if (panelItems.Count == 0) return;
@@ -166,7 +153,6 @@ namespace MissionPlanner.Controls
             }
         }
 
-
         protected override void OnResize(EventArgs e)
         {
             this.SuspendLayout();
@@ -177,11 +163,8 @@ namespace MissionPlanner.Controls
             this.ResumeLayout();
         }
 
-
-
         public void setPanels(string[] panelNames, string[] panelLabels)
         {
-
             if (panelLabels.Count() != panelNames.Count()) return;
             if (panelLabels.Count() == 0) return;
 
@@ -194,7 +177,6 @@ namespace MissionPlanner.Controls
                 i.btn.Text = panelLabels[index++];
                 i.btn.BackColor = this.BackColor;
             }
-
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -210,7 +192,6 @@ namespace MissionPlanner.Controls
 
         public Stat getStatus(string panelName)
         {
-
             panelName = panelName.ToUpper();
             panelItem p = panelItems.Find(x => x.name == panelName);
 
@@ -225,7 +206,6 @@ namespace MissionPlanner.Controls
             }
         }
 
-
         public void setStatus(string panelName, Stat c)
         {
             panelItem p = panelItems.Find(x => x.name == panelName);
@@ -237,14 +217,12 @@ namespace MissionPlanner.Controls
 
         private void panel_Click(object sender, EventArgs e)
         {
-
             var b = (panelButton)sender;
 
             //find the panel by the button
             panelItem p = panelItems.Find(x => x.name == b.buttonName);
 
             if ((p.Status == Stat.DISABLED) && (b.BackColor == Color.DarkSlateGray)) return;
-
 
             if (b.Selected)
             {
@@ -260,15 +238,12 @@ namespace MissionPlanner.Controls
                 p.select();
             }
 
-
             EventHandler handler = this.buttonClicked;
             if (handler != null)
             {
                 handler(this, e);
             }
-
         }
-
 
         private void changeActiveState()
         {
@@ -277,9 +252,7 @@ namespace MissionPlanner.Controls
                 i.btn._trans = _transparency;
                 i.update();
             }
-
         }
-
 
         private void annunciator_EnabledChanged(object sender, EventArgs e)
         {
@@ -297,7 +270,6 @@ namespace MissionPlanner.Controls
                     i.disable();
                 }
             }
-
         }
 
         private void menuUndockDock_Click(object sender, EventArgs e)
@@ -308,13 +280,10 @@ namespace MissionPlanner.Controls
                 handler(this, e);
             }
         }
-
-
     }
 
     public class panelItem : IEquatable<panelItem>
     {
-
         public panelButton btn { get; set; }
 
         private string _name;
@@ -354,7 +323,6 @@ namespace MissionPlanner.Controls
             btn = new panelButton();
         }
 
-
         public override string ToString()
         {
             return name;
@@ -378,13 +346,11 @@ namespace MissionPlanner.Controls
             return (this.name.Equals(other.name));
         }
 
-
         public void disable()
         {
             this.btn.Status = Stat.DISABLED;
             this._disabled = true;
             this.btn.Invalidate();
-
         }
 
         public void enable()
@@ -392,7 +358,6 @@ namespace MissionPlanner.Controls
             this.btn.Status = this.Status;
             this._disabled = false;
             this.btn.Invalidate();
-
         }
 
         public void select()
@@ -419,7 +384,6 @@ namespace MissionPlanner.Controls
             Status = Status;
         }
     }
-
 
     public class panelButton : Button
     {
@@ -485,7 +449,6 @@ namespace MissionPlanner.Controls
         }
         //End - Counded corners.
 
-
         public Stat Status
         {
             get { return _status; }
@@ -521,15 +484,11 @@ namespace MissionPlanner.Controls
 
         public panelButton()
         {
-
             _ColorMouseDown = Color.FromArgb(150, 0x2b, 0x3a, 0x03);
-
 
             Status = Stat.NOMINAL;
             Selected = false;
-
         }
-
 
         private void setStatus(Stat status)
         {
@@ -567,7 +526,6 @@ namespace MissionPlanner.Controls
 
             this.Invalidate();
         }
-
 
         public void blink(bool b)
         {
@@ -613,9 +571,7 @@ namespace MissionPlanner.Controls
             }
 
             this.Invalidate();
-
         }
-
 
         protected override void OnPaint(PaintEventArgs pevent)
         {
@@ -672,9 +628,7 @@ namespace MissionPlanner.Controls
                 // left line
                 outline.AddLine(0, height - wid, 0, wid - wid / 2);
 
-
                 gr.FillPath(linear, outline);
-
 
                 if (_selected)
                 {
@@ -684,13 +638,9 @@ namespace MissionPlanner.Controls
                 else
                 {
                     //gr.DrawImage(Properties.Resources.button_shadow, 0, 0, this.Width, this.Height);
-
                 }
 
                 SolidBrush mybrush = new SolidBrush(TextColor);
-
-
-
 
                 //if (_mouseover)
                 //{
@@ -711,7 +661,6 @@ namespace MissionPlanner.Controls
 
                     gr.FillPath(brush, outline);
                 }
-
 
                 StringFormat stringFormat = new StringFormat();
                 stringFormat.Alignment = StringAlignment.Center;
@@ -753,5 +702,4 @@ namespace MissionPlanner.Controls
             base.WndProc(ref m);
         }
     }
-
 }

@@ -22,7 +22,6 @@ namespace ptPlugin1
             timer1.Start();
         }
 
-
         private void timer1_Tick(object sender, EventArgs e)
         {
             ekfvel.Value = (int)(MainV2.comPort.MAV.cs.ekfvelv * 100);
