@@ -98,6 +98,10 @@
       <Project>{d773accd-9c2d-4e94-a967-faa7ea2d21cb}</Project>
       <Name>GMap.NET.Drawing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\ExtLibs\Interfaces\Interfaces.csproj">
+      <Project>{FD4D2994-9BEA-41A1-8C51-2E02D1E8503E}</Project>
+      <Name>Interfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\ExtLibs\Maps\MissionPlanner.Maps.csproj">
       <Project>{6c4ff9c3-7aff-4274-b8fc-4a93a1faadea}</Project>
       <Name>MissionPlanner.Maps</Name>

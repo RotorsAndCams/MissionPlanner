@@ -1465,25 +1465,36 @@ namespace ptPlugin1
             var winddir = Host.cs.g_wind_dir;
             string winddir_input = winddir.ToString();
 
-            if (Host.cs.g_wind_vel < 4)
-            {
-                InputBox.Show("Low windspeed detected", "You can enter wind direction manually or accept meassured value", ref winddir_input);
-                try
-                {
-                    winddir = float.Parse(winddir_input);
-                }
-                catch { }
+            //if (Host.cs.g_wind_vel < 4)
+            //{
+            //    InputBox.Show("Low windspeed detected", "You can enter wind direction manually or accept meassured value", ref winddir_input);
+            //    try
+            //    {
+            //        winddir = float.Parse(winddir_input);
+            //    }
+            //    catch { }
 
-                // Sanity checks 
-                if (winddir < 0 || winddir > 359) winddir = Host.cs.g_wind_dir;
-            }
+            //    // Sanity checks 
+            //    if (winddir < 0 || winddir > 359) winddir = Host.cs.g_wind_dir;
+            //}
+
+            TabPage tobeSelected = Host.MainForm.FlightData.tabControlactions.TabPages["tabWeather"];
+            if (tobeSelected != null) Host.MainForm.FlightData.tabControlactions.SelectedTab = tobeSelected;
+
+            CustomMessageBox.Show("Check Weather station wind direction and strength before landing!");
 
             float landReverse = Host.config.GetFloat("LandDirectionReverse", 0);  // Load or default
             Host.config["LandDirectionReverse"] = landReverse.ToString();         // Save
    
             PointLatLngAlt lp = Host.FDMenuMapPosition;
-            lc.updateLandingData(lp, wrap360(winddir - landReverse), Host.cs.g_wind_vel, (int)Host.comPort.MAV.param["WP_LOITER_RAD"].Value);
-   
+
+            if (Host.comPort.BaseStream != null && Host.comPort.BaseStream.IsOpen)
+                lc.updateLandingData(lp, wrap360(winddir - landReverse), Host.cs.g_wind_vel, (int)Host.comPort.MAV.param["WP_LOITER_RAD"].Value);
+            else
+            {
+                CustomMessageBox.Show("Not connected - landing point is not valid");
+            }
+
             landingOverlay.Markers.Clear();
             landingOverlay.Routes.Clear();
 

@@ -751,9 +751,9 @@ namespace MissionPlanner
 
             log.Info("Th Name " + Thread?.Name);
 
-            //var dr = DialogResult.Yes;
-                //CustomMessageBox.Show("An error has occurred\n" + ex.ToString() + "\n\nReport this Error???",
-                //    "Send Error", MessageBoxButtons.YesNo);
+            var dr = DialogResult.Yes;
+            CustomMessageBox.Show("An error has occurred\n" + ex.ToString() + "\n\nReport this Error???",
+                "Send Error", MessageBoxButtons.YesNo);
             if (true)
             {
                 try
