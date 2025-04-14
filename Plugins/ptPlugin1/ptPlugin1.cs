@@ -623,7 +623,7 @@ namespace ptPlugin1
             Host.config[_telemetryUdpPortKey] = _telemetryUdpPort.ToString();
 
             // Get Flight Termination UDP address and port from config
-            _flightTermUDPAddr = IPAddress.Parse(Host.config[_flightTermUDPAddrKey, "192.168.69.100"]);
+            _flightTermUDPAddr = IPAddress.Parse(Host.config[_flightTermUDPAddrKey, "192.168.69.99"]);
             Host.config[_flightTermUDPAddrKey] = _flightTermUDPAddr.ToString();
             _flightTermUDPPort = Host.config.GetInt32(_flightTermUDPPortKey, 19728);
             Host.config[_flightTermUDPPortKey] = _flightTermUDPPort.ToString();
