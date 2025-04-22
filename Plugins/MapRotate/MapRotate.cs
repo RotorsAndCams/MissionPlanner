@@ -95,7 +95,7 @@ namespace MapRotate
             Host.FDMenuMap.Items.Add(setCatapultLocationMenuItem);
 
             _isSupervisor = Host.config.GetBoolean(_isSupervisorKey, false);
-            Host.config[_isSupervisorKey] = false.ToString();
+            Host.config[_isSupervisorKey] = _isSupervisor.ToString();
             
             if (!_isSupervisor)
             {
