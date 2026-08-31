@@ -641,6 +641,22 @@ namespace MissionPlanner.Joystick
                             }
                         }, null);
                         break;
+                    case buttonfunction.Do_Parachute_Action:
+                        _context.Send(delegate
+                        {
+                            try
+                            {
+                                Interface.doCommand((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent,
+                                    MAVLink.MAV_CMD.DO_PARACHUTE,
+                                    but.p1,
+                                    0, 0, 0, 0, 0, 0);
+                            }
+                            catch
+                            {
+                                CustomMessageBox.Show("Failed to Do_Parachute_Action");
+                            }
+                        }, null);
+                        break;
                 }
             }
         }
