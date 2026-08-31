@@ -619,6 +619,28 @@ namespace MissionPlanner.Joystick
                             }
                         }, null);
                         break;
+                    case buttonfunction.Do_Command_Int:
+                        _context.Send(delegate
+                        {
+                            try
+                            {
+                                // Unpack parameters from JoyButton.mode
+                                string[] strParams = but.mode.Split(';').ToArray(); // [CompID, Command, X, Y, Z]
+                                byte compID = byte.Parse(strParams[0]);
+                                MAVLink.MAV_CMD command = (MAVLink.MAV_CMD)int.Parse(strParams[1]);
+                                int x = int.Parse(strParams[2]),
+                                    y = int.Parse(strParams[3]),
+                                    z = int.Parse(strParams[4]);
+
+                                // Send command
+                                Interface.doCommandInt((byte)Interface.sysidcurrent, compID, command, but.p1, but.p2, but.p3, but.p4, x, y, z);
+                            }
+                            catch
+                            {
+                                CustomMessageBox.Show("Failed to Do_Command_Int");
+                            }
+                        }, null);
+                        break;
                 }
             }
         }

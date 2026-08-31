@@ -480,6 +480,9 @@ namespace MissionPlanner.Joystick
                 case buttonfunction.Button_axis1:
                     new Joy_Button_axis((string)cmb.Tag).ShowDialog();
                     break;
+                case buttonfunction.Do_Command_Int:
+                    new Joy_Do_Command_Int((string)cmb.Tag).ShowDialog();
+                    break;
                 default:
                     CustomMessageBox.Show("No settings to set", "No settings");
                     break;

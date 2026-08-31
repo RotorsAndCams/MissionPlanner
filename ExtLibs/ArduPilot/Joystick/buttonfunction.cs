@@ -17,5 +17,6 @@
         Mount_Control_0,
         Button_axis0,
         Button_axis1,
+        Do_Command_Int
     }
 }
